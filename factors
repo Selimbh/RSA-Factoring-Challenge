@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+import sys
+import math
+
+def is_prime(n):
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0 or n % 3 == 0:
+        return False
+    i = 5
+    while i * i <= n:
+        if n % i == 0 or n % (i + 2) == 0:
+            return False
+        i += 6
+    return True
+
+def factorize(number):
+    if number <= 1:
+        return []
+
+    factors = []
+    # Check for divisibility by 2
+    while number % 2 == 0:
+        factors.append(2)
+        number //= 2
+
+    # Check for divisibility by odd numbers
+    for i in range(3, int(math.sqrt(number)) + 1, 2):
+        while number % i == 0:
+            factors.append(i)
+            number //= i
+
+    # If the remaining number is prime and greater than 2, add it to factors
+    if number > 2 and is_prime(number):
+        factors.append(number)
+
+    return factors
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: rsa <file>")
+        sys.exit(1)
+
+    input_file = sys.argv[1]
+
+    try:
+        with open(input_file, 'r') as file:
+            for line in file:
+                number = int(line.strip())
+                factors = factorize(number)
+                prime_factors = [factor for factor in factors if is_prime(factor)]
+                if len(prime_factors) == 2:
+                    p, q = prime_factors
+                    print(f"{number}={p}*{q}")
+                else:
+                    print(f"Error: Could not factorize {number} into two prime factors.")
+    except FileNotFoundError:
+        print(f"Error: File '{input_file}' not found.")
+        sys.exit(1)
+    except ValueError:
+        print(f"Error: Invalid input in file '{input_file}'.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
